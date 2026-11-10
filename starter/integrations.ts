@@ -2,6 +2,7 @@
 // Transport, persistence, validation, and the bounded agent loop are supplied.
 // Complete provider adapters live in ../src/ for reference.
 import { complete, type Complete } from '../src/model.ts';
+import { config } from '../src/config.ts';
 import type { Browse } from '../src/browser.ts';
 import type { PersonalMemory } from '../src/memory.ts';
 import type { Store } from '../src/store.ts';
@@ -17,12 +18,57 @@ export class IntegrationIncomplete extends Error {
 // which POSTs to MODEL_BASE_URL/chat/completions and returns the assistant message.
 export const callModel: Complete = (messages, tools, signal) => complete(messages, tools, signal);
 
-export async function searchWeb(_query: string, _signal: AbortSignal): Promise<unknown> {
-  // TODO 2 — EXA
-  // Implement POST https://api.exa.ai/search with your EXA_API_KEY.
-  // Request contents: { highlights: true }; preserve URLs and bound the results.
-  // See search() in ../src/agent.ts for the complete reference implementation.
-  throw new IntegrationIncomplete(2, 'Exa');
+// TODO 2 — EXA (done): POST https://api.exa.ai/search with highlights.
+// Docs: https://exa.ai/docs/reference/search, https://exa.ai/docs/search/highlights
+const exaSearchUrl = 'https://api.exa.ai/search';
+// Bounds on what one search can put into the model's context.
+const evidenceLimits = { results: 5, highlightsPerResult: 3, highlightChars: 1200, titleChars: 200, urlChars: 2048 };
+
+type ExaResult = { title?: unknown; url?: unknown; highlights?: unknown };
+export type SearchEvidence = { title: string; url: string; highlights: string[] };
+
+// URLs are kept intact (a truncated URL is a broken citation), so results
+// without a usable URL are dropped rather than trimmed.
+function hasUsableUrl(item: ExaResult): item is ExaResult & { url: string } {
+  return typeof item.url === 'string' && item.url.length > 0 && item.url.length <= evidenceLimits.urlChars;
+}
+
+function boundEvidence(item: ExaResult & { url: string }): SearchEvidence {
+  const highlights = Array.isArray(item.highlights) ? item.highlights : [];
+  return {
+    title: String(item.title ?? '').slice(0, evidenceLimits.titleChars),
+    url: item.url,
+    highlights: highlights.filter((text): text is string => typeof text === 'string')
+      .slice(0, evidenceLimits.highlightsPerResult).map(text => text.slice(0, evidenceLimits.highlightChars)),
+  };
+}
+
+function requestExaSearch(query: string, signal: AbortSignal): Promise<Response> {
+  return fetch(exaSearchUrl, {
+    method: 'POST',
+    headers: { 'x-api-key': config.exaKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, type: 'auto', numResults: evidenceLimits.results, contents: { highlights: true } }),
+    signal: AbortSignal.any([signal, AbortSignal.timeout(20_000)]), redirect: 'error',
+  });
+}
+
+// The agent loop hides tool errors from the terminal (the model just sees
+// "tool unavailable"), so log the cause here before rethrowing.
+function searchFailed(reason: string): Error {
+  console.error(`${new Date().toISOString()} [starter] Exa search failed: ${reason}`);
+  return new Error(`Exa search failed: ${reason}`);
+}
+
+export async function searchWeb(query: string, signal: AbortSignal): Promise<unknown> {
+  const response = await requestExaSearch(query, signal);
+  if (!response.ok) {
+    await response.body?.cancel().catch(() => {});
+    throw searchFailed(`HTTP ${response.status}`);
+  }
+  const data = await response.json() as { results?: unknown };
+  if (!Array.isArray(data.results)) throw searchFailed('response has no results array');
+  const results = (data.results as ExaResult[]).filter(hasUsableUrl).slice(0, evidenceLimits.results).map(boundEvidence);
+  return { retrievedAt: new Date().toISOString(), results };
 }
 
 export const readPage: Browse = async (_url, _question, _signal) => {
