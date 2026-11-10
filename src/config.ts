@@ -56,7 +56,7 @@ export function assertReady(channel = false): void {
   }
   if (config.milestone >= 3 && !config.kernelKey.trim()) throw new Error('Set KERNEL_API_KEY for milestone 3 and later.');
   if (channel) {
-    if (config.milestone < 5) throw new Error('Set WORKSHOP_MILESTONE=5 for phone messaging. Use npm run chat for milestones 1–4.');
+    if (config.milestone < 5) throw new Error('Set WORKSHOP_MILESTONE=5 for phone messaging. Use pnpm run chat for milestones 1–4.');
     if (!['linq', 'whatsapp'].includes(config.messagingChannel)) throw new Error('Set MESSAGING_CHANNEL to linq or whatsapp.');
     if (!['local', 'jev'].includes(config.reactionMode)) throw new Error('Set REACTION_MODE to local or jev.');
     if (config.messagingChannel === 'linq' && config.reactionMode === 'jev' && !reactionKey().trim()) throw new Error('Set OPENROUTER_API_KEY for Jev reactions.');

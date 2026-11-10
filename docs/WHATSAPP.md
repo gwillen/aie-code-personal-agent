@@ -1,6 +1,6 @@
 # Use WhatsApp for the complete demo
 
-The instructor solution supports WhatsApp through Meta's WhatsApp Cloud API. Select one phone channel per server: `linq` (the default) or `whatsapp`. The same agent, Exa search, Kernel browser, and Mem0 profile work on both. The starter's TODO 5 remains a Linq exercise; run `npm run solution:phone` for the WhatsApp option.
+The instructor solution supports WhatsApp through Meta's WhatsApp Cloud API. Select one phone channel per server: `linq` (the default) or `whatsapp`. The same agent, Exa search, Kernel browser, and Mem0 profile work on both. The starter's TODO 5 remains a Linq exercise; run `pnpm run solution:phone` for the WhatsApp option.
 
 This adapter handles direct text from your configured owner number and replies with text and source links. It requests a native preview for each source link, one by default and up to three when requested. Preview rendering depends on WhatsApp and the source page. Emoji reactions, outbound voice, incoming audio transcription, media, groups, and template messages are not implemented on this channel. Voice requests receive an explanation in text.
 
@@ -39,8 +39,8 @@ This single-owner adapter requires an inbound `from` phone number matching that 
 ## 3. Start the server and connect the webhook
 
 ```sh
-npm run doctor
-npm run solution:phone
+pnpm run doctor
+pnpm run solution:phone
 ```
 
 In a second terminal, start your authenticated ngrok tunnel:

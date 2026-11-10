@@ -14,7 +14,7 @@ async function chat(text: string) {
     store.addTurn(scope, 'assistant', reply);
     console.log(`\nAgent: ${reply}\n`);
   } catch (error) {
-    console.error('Request failed. Check credentials and provider availability with npm run doctor.');
+    console.error('Request failed. Check credentials and provider availability with pnpm run doctor.');
     process.exitCode = 1;
   }
 }

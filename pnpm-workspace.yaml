@@ -1,0 +1,19 @@
+# pnpm settings for this repo (no workspace packages; settings only).
+# Supply-chain hardening: these are set explicitly so they apply regardless of
+# the pnpm version's defaults. Requires pnpm 11+ (enforced by engines in package.json),
+# which also re-verifies pnpm-lock.yaml entries against these policies on install.
+
+# Only install versions published at least two weeks ago (in minutes).
+minimumReleaseAge: 20160
+
+# Transitive dependencies may only come from the registry, never git URLs or tarballs.
+blockExoticSubdeps: true
+
+# Refuse a version whose publish trust level (trusted publisher / provenance)
+# is weaker than earlier releases of the same package.
+trustPolicy: no-downgrade
+
+# Install scripts are blocked unless listed here. better-sqlite3 needs its
+# script to fetch or compile its native SQLite binding.
+allowBuilds:
+  better-sqlite3: true

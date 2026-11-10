@@ -84,8 +84,8 @@ Save the returned `signing_secret` as `LINQ_WEBHOOK_SECRET` in `.env`. Keep the 
 ## Verify a real round trip
 
 ```sh
-npm run doctor
-npm start
+pnpm run doctor
+pnpm start
 ```
 
 Open `http://127.0.0.1:3400/healthz`, then the tunnel's `/healthz`. Both should return `{"ok":true}`. Text your provisioned line from the owner phone. Send `/help` first, then a research request to exercise the model and Exa.

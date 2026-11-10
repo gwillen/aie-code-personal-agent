@@ -2,15 +2,15 @@
 
 Build in this order: **model → Exa → Kernel → Mem0 → Linq**. Each stage adds a capability to the same application. Use the terminal through milestone 4, then connect the phone in milestone 5.
 
-Attendees edit the five TODOs in `starter/integrations.ts` and run `npm run starter:chat`, then `npm run starter:phone`. Your instructor solution is independent: `npm run solution:chat` and `npm run solution:phone`. The model/tool loop, queue, validation, and provider adapters are supplied infrastructure; the exercises connect the five provider boundaries.
+Attendees edit the five TODOs in `starter/integrations.ts` and run `pnpm run starter:chat`, then `pnpm run starter:phone`. Your instructor solution is independent: `pnpm run solution:chat` and `pnpm run solution:phone`. The model/tool loop, queue, validation, and provider adapters are supplied infrastructure; the exercises connect the five provider boundaries.
 
 The build walkthrough starts after the overview: open **http://127.0.0.1:3402/#slide-14**.
 
 ## Prework
 
-Install **Node.js 26.12.1+ and npm** before class. Recommended for macOS, Linux, or Windows WSL: follow the [official nvm installation guide](https://github.com/nvm-sh/nvm#installing-and-updating), then reopen your terminal. After cloning, `nvm install` and `nvm use` read the project’s `.nvmrc`. If you already have a compatible Node installation, skip those two commands. Check with `node --version` and `npm --version`.
+Install **Node.js 26.12.1+ and pnpm 11+** before class. Recommended for macOS, Linux, or Windows WSL: follow the [official nvm installation guide](https://github.com/nvm-sh/nvm#installing-and-updating), then reopen your terminal. After cloning, `nvm install` and `nvm use` read the project’s `.nvmrc`. If you already have a compatible Node installation, skip those two commands. Install pnpm from [pnpm.io/installation](https://pnpm.io/installation), or with `npm install -g pnpm@11`. Check with `node --version` and `pnpm --version`.
 
-Have a local package manager (**npm**, included with Node.js) and an MCP-capable coding agent **installed and running locally**. You do not need to run model inference locally.
+Have a local package manager (**pnpm 11+**; the repository's supply-chain settings in `pnpm-workspace.yaml` need it) and an MCP-capable coding agent **installed and running locally**. You do not need to run model inference locally.
 
 Install Node 26.12.1+ and arrange funded model access, an Exa key, and a Kernel key. Clone the repository, install dependencies, and create `.env` at the beginning of the presentation. Have an MCP-capable coding assistant installed. For the phone stage, complete [Linq setup](LINQ.md) before class: provision a line, install an HTTPS tunnel, create a filtered subscription, and save its signing secret.
 
@@ -23,7 +23,7 @@ git clone https://github.com/JakubHojsan/aie-code-personal-agent.git
 cd aie-code-personal-agent
 nvm install
 nvm use
-npm ci
+pnpm install --frozen-lockfile
 cp .env.example .env
 ```
 
@@ -46,7 +46,7 @@ Do not write code yet.
 
 **What it does:** turns the conversation into an assistant message. Later, it can request tools.
 
-Set `WORKSHOP_MILESTONE=1` and your model key. Run `npm run doctor`, then `npm run starter:chat`. The doctor checks local configuration only; a real reply verifies provider access.
+Set `WORKSHOP_MILESTONE=1` and your model key. Run `pnpm run doctor`, then `pnpm run starter:chat`. The doctor checks local configuration only; a real reply verifies provider access.
 
 Complete TODO 1 (`callModel`) in `starter/integrations.ts`. Read the supplied transport in `src/model.ts` and the `complete(messages, tools, signal)` call in the complete reference `src/agent.ts`. Begin with an empty tool array. Follow a user message through the request and back to the terminal. The supplied system prompt already requests concise phone replies. Keep this exercise focused on the model callback.
 
@@ -97,7 +97,7 @@ Exit, restart, and send `What do you remember about me?` again. Ask “Find dinn
 
 **What it does:** delivers incoming phone messages to your webhook and sends replies back.
 
-Complete TODO 5 (`deliverReply`) in `starter/integrations.ts`. Stop the CLI. Set `WORKSHOP_MILESTONE=5`, complete [Linq setup](LINQ.md), and run `npm run doctor`, then `npm run starter:phone`. Start your HTTPS tunnel to port 3400 and confirm that the subscription points to its current URL.
+Complete TODO 5 (`deliverReply`) in `starter/integrations.ts`. Stop the CLI. Set `WORKSHOP_MILESTONE=5`, complete [Linq setup](LINQ.md), and run `pnpm run doctor`, then `pnpm run starter:phone`. Start your HTTPS tunnel to port 3400 and confirm that the subscription points to its current URL.
 
 Read `starter/server.ts` and the complete reference `src/server.ts`: the worker calls the same `answer(store, owner, text)` used by the terminal. Follow `src/http.ts` → `src/linq.ts` → `src/store.ts` → `src/worker.ts` → `src/agent.ts`.
 
@@ -130,7 +130,7 @@ These are the same prompts shown on the slides. Paste one at a time. Edit only `
 Read starter/README.md and src/model.ts.
 Implement TODO 1 in starter/integrations.ts.
 Connect complete(); forward messages, tools, and signal.
-Leave TODOs 2–5 unfinished. Run npm run typecheck.
+Leave TODOs 2–5 unfinished. Run pnpm run typecheck.
 Show how to verify a real reply with starter:chat.
 ```
 
@@ -141,7 +141,7 @@ Use Exa MCP to find the official Search API docs.
 Implement TODO 2 in starter/integrations.ts.
 POST /search: type auto, numResults 5, highlights true.
 Preserve URLs and retrieval time; bound the evidence.
-Use the existing tool loop. Run npm run typecheck.
+Use the existing tool loop. Run pnpm run typecheck.
 ```
 
 ### 3. Kernel
@@ -216,7 +216,7 @@ Keep owner checks, deduplication, and reply retries.
 Test reaction → typing → reply, plus API failures.
 ```
 
-Set `REACTION_MODE=jev` and `OPENROUTER_API_KEY` in `.env`. Run `npm run doctor`, `npm run typecheck`, and `npm test`, then restart `npm run starter:phone`. Keep ngrok running.
+Set `REACTION_MODE=jev` and `OPENROUTER_API_KEY` in `.env`. Run `pnpm run doctor`, `pnpm run typecheck`, and `pnpm test`, then restart `pnpm run starter:phone`. Keep ngrok running.
 
 Extend `acknowledgeMessage()` in `starter/extras.ts` to receive message text. Use `src/reactions.ts` for the OpenRouter Decisions request (`typesafe/jev-1.14`), validated choices, and a two-second timeout. Include a `none` choice for sensitive messages or requests to avoid emojis. Use `queryEmoji()` as a local fallback on API errors.
 

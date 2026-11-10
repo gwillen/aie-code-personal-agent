@@ -8,3 +8,5 @@ node_modules/
 __pycache__/
 *.log
 .DS_Store
+# npm is not used here (see pnpm-workspace.yaml); keep a stray npm lockfile out.
+package-lock.json

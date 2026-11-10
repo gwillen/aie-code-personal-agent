@@ -46,7 +46,7 @@ export class Worker {
           }
           // No provider payloads, message contents, phone numbers, or credentials in logs.
           this.store.retry(job.id, job.attempts + 1, 'Generation or delivery failed');
-          console.error('Reply attempt failed. Run npm run doctor to check configuration.');
+          console.error('Reply attempt failed. Run pnpm run doctor to check configuration.');
           break;
         } finally {
           try { await stopTyping?.(); }

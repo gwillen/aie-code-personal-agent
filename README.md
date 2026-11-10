@@ -11,7 +11,8 @@ The agent runs on your laptop. Qwen inference, Exa search, Kernel browsers, and 
 ## Before you arrive
 
 - Git. The workshop repository is public: [github.com/JakubHojsan/aie-code-personal-agent](https://github.com/JakubHojsan/aie-code-personal-agent).
-- Node.js **26.12.1+**, with npm. We recommend [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) for macOS, Linux, or Windows WSL. Install it before class and reopen your terminal.
+- Node.js **26.12.1+**. We recommend [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) for macOS, Linux, or Windows WSL. Install it before class and reopen your terminal.
+- [pnpm](https://pnpm.io/installation) **11+**. If you don't have it, `npm install -g pnpm@11` once Node is installed. Check with `pnpm --version`.
 - A coding assistant running locally, with support for MCP.
 - An OpenRouter key to start. Arrange Exa, Kernel, and [Linq sandbox access](docs/LINQ.md) before the workshop so you can complete the phone exercises.
 
@@ -24,12 +25,21 @@ git clone https://github.com/JakubHojsan/aie-code-personal-agent.git
 cd aie-code-personal-agent
 nvm install
 nvm use
-npm ci
+pnpm install --frozen-lockfile
 cp .env.example .env
 nano .env
 ```
 
-The nvm commands select the version in `.nvmrc`; skip them if you already have Node 26.12.1+ installed. Check with `node --version` and `npm --version`.
+The nvm commands select the version in `.nvmrc`; skip them if you already have Node 26.12.1+ installed. Check with `node --version` and `pnpm --version`.
+
+`--frozen-lockfile` installs exactly the versions in `pnpm-lock.yaml` and fails instead of changing it. [`pnpm-workspace.yaml`](pnpm-workspace.yaml) sets supply-chain protections that apply to every install, including dependency changes:
+
+- **Two-week minimum release age.** pnpm refuses package versions published less than 14 days ago, so a compromised release has time to be caught. If you add or update a dependency and pnpm reports `ERR_PNPM_NO_MATURE_MATCHING_VERSION`, pick an older version rather than lowering the setting.
+- **Registry-only dependencies.** Transitive dependencies can't come from git repositories or tarball URLs.
+- **No trust downgrades.** pnpm refuses a version published with weaker provenance than earlier releases of the same package.
+- **Install scripts blocked by default.** Only `better-sqlite3` may run its install script, to fetch or build its native SQLite module.
+
+pnpm 11 also re-checks every `pnpm-lock.yaml` entry against these rules on each install. `package.json` requires pnpm 11+ so older versions can't skip the checks. Use pnpm rather than npm here, since npm ignores these settings and the lockfile.
 
 Keep `WORKSHOP_MILESTONE=1` and fill in `OPENROUTER_API_KEY`. Save in nano with Ctrl+O, Enter, then Ctrl+X.
 
@@ -61,11 +71,11 @@ First, [connect Exa MCP](docs/MCP.md) to your coding assistant and use it to fin
 Edit [starter/integrations.ts](starter/integrations.ts). The functions are intentionally unfinished: implement each TODO, set the matching `WORKSHOP_MILESTONE` in `.env`, and restart the agent.
 
 ```sh
-npm run doctor
-npm run starter:chat
+pnpm run doctor
+pnpm run starter:chat
 ```
 
-Use terminal chat through step 4. After [Linq and ngrok setup](docs/LINQ.md), switch to `npm run starter:phone`. The doctor checks configuration; the checkpoint verifies the actual integration.
+Use terminal chat through step 4. After [Linq and ngrok setup](docs/LINQ.md), switch to `pnpm run starter:phone`. The doctor checks configuration; the checkpoint verifies the actual integration.
 
 Optional exercises in [starter/extras.ts](starter/extras.ts) add Jev emoji reactions followed by iMessage typing bubbles, or voice replies through OpenRouter TTS.
 
@@ -78,14 +88,14 @@ The finished implementation lives in `src/` and works independently of the start
 For a quick terminal reply, keep milestone 1 and run:
 
 ```sh
-npm run solution:chat
+pnpm run solution:chat
 ```
 
 For the full phone demo, fill in the settings above, set `WORKSHOP_MILESTONE=5`, and follow [Linq setup](docs/LINQ.md) to start ngrok and register its HTTPS URL. Once the webhook secret is saved:
 
 ```sh
-npm run doctor
-npm run solution:phone
+pnpm run doctor
+pnpm run solution:phone
 ```
 
 Text the Linq number from your configured owner number:
@@ -107,12 +117,12 @@ Keep your laptop awake and ngrok running. If the tunnel URL changes, update the 
 
 ### Optional WhatsApp channel
 
-Follow [docs/WHATSAPP.md](docs/WHATSAPP.md) to obtain Meta Cloud API credentials and connect `/webhooks/whatsapp`. Set `MESSAGING_CHANNEL=whatsapp` and `WORKSHOP_MILESTONE=5` in `.env`, fill in the `WHATSAPP_*` settings, then run `npm run doctor` and `npm run solution:phone`. WhatsApp mode does not require Linq credentials. Text, search, memory, and source links are supported; voice replies and emoji reactions remain Linq features. The starter exercise still uses Linq.
+Follow [docs/WHATSAPP.md](docs/WHATSAPP.md) to obtain Meta Cloud API credentials and connect `/webhooks/whatsapp`. Set `MESSAGING_CHANNEL=whatsapp` and `WORKSHOP_MILESTONE=5` in `.env`, fill in the `WHATSAPP_*` settings, then run `pnpm run doctor` and `pnpm run solution:phone`. WhatsApp mode does not require Linq credentials. Text, search, memory, and source links are supported; voice replies and emoji reactions remain Linq features. The starter exercise still uses Linq.
 
 ## Present
 
 ```sh
-npm run slides
+pnpm run slides
 ```
 
 Open [localhost:3402](http://127.0.0.1:3402). One deck covers the 12-minute overview and the workshop, which starts on slide 14. Allow 40 minutes for the core exercises and 8 minutes for Q&A; the optional exercises need extra time.
@@ -131,6 +141,6 @@ Arrow keys navigate, **N** opens inline speaker notes, and **F** enters fullscre
 | `docs/` | Workshop prompts, setup, and instructor notes |
 | `test/` | Agent, memory, browser, and messaging tests |
 
-Run `npm run typecheck` and `npm test` to check changes. After editing embedded slide notes, run `npm run slides:notes` to update the speaker-notes file.
+Run `pnpm run typecheck` and `pnpm test` to check changes. After editing embedded slide notes, run `pnpm run slides:notes` to update the speaker-notes file.
 
 Credentials stay in `.env`; conversations, memory, and audio stay in `.data/`. Both are ignored by Git. The code is [MIT licensed](LICENSE); hosted API usage requires your own accounts and credits.
