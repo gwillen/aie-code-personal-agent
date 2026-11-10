@@ -3,7 +3,7 @@
 // Complete provider adapters live in ../src/ for reference.
 import { complete, type Complete } from '../src/model.ts';
 import { config } from '../src/config.ts';
-import type { Browse } from '../src/browser.ts';
+import { browse, type Browse } from '../src/browser.ts';
 import type { PersonalMemory } from '../src/memory.ts';
 import type { Store } from '../src/store.ts';
 import type { Send } from '../src/worker.ts';
@@ -71,12 +71,12 @@ export async function searchWeb(query: string, signal: AbortSignal): Promise<unk
   return { retrievedAt: new Date().toISOString(), results };
 }
 
-export const readPage: Browse = async (_url, _question, _signal) => {
-  // TODO 3 — KERNEL
-  // Connect the browse() adapter in ../src/browser.ts to this tool callback.
-  // Read its create → execute → delete lifecycle; retain its validation/cleanup.
-  throw new IntegrationIncomplete(3, 'Kernel');
-};
+// TODO 3 — KERNEL (done): forward unchanged to the supplied browse() adapter.
+// It validates the URL (public HTTPS hostname only), creates a Kernel browser
+// whose egress is limited to that host, runs fixed read-only Playwright code,
+// rejects off-host redirects, and always deletes the session (60s timeout backstop).
+// Docs: https://www.kernel.sh/docs/introduction/create
+export const readPage: Browse = (url, question, signal) => browse(url, question, signal);
 
 export function connectMemory(_store: Store): PersonalMemory {
   // TODO 4 — MEM0
