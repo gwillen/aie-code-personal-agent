@@ -8,11 +8,11 @@ The build walkthrough starts after the overview: open **http://127.0.0.1:3402/#s
 
 ## Prework
 
-Install **Node.js 26.12.1+ and pnpm 11+** before class. Recommended for macOS, Linux, or Windows WSL: follow the [official nvm installation guide](https://github.com/nvm-sh/nvm#installing-and-updating), then reopen your terminal. After cloning, `nvm install` and `nvm use` read the project’s `.nvmrc`. If you already have a compatible Node installation, skip those two commands. Install pnpm from [pnpm.io/installation](https://pnpm.io/installation), or with `npm install -g pnpm@11`. Check with `node --version` and `pnpm --version`.
+Install **pnpm 11+** before class from [pnpm.io/installation](https://pnpm.io/installation), and check with `pnpm --version`. You don't need to install Node yourself: the project pins Node 26.12.1 in `package.json` (`devEngines.runtime`), and `pnpm install` downloads it. `pnpm run …` scripts use that Node regardless of any global installation.
 
 Have a local package manager (**pnpm 11+**; the repository's supply-chain settings in `pnpm-workspace.yaml` need it) and an MCP-capable coding agent **installed and running locally**. You do not need to run model inference locally.
 
-Install Node 26.12.1+ and arrange funded model access, an Exa key, and a Kernel key. Clone the repository, install dependencies, and create `.env` at the beginning of the presentation. Have an MCP-capable coding assistant installed. For the phone stage, complete [Linq setup](LINQ.md) before class: provision a line, install an HTTPS tunnel, create a filtered subscription, and save its signing secret.
+Install pnpm and arrange funded model access, an Exa key, and a Kernel key. Clone the repository, install dependencies, and create `.env` at the beginning of the presentation. Have an MCP-capable coding assistant installed. For the phone stage, complete [Linq setup](LINQ.md) before class: provision a line, install an HTTPS tunnel, create a filtered subscription, and save its signing secret.
 
 Set `OWNER_PHONE_NUMBER` before writing memories so the terminal and phone use the same identity. Set the owner's local IANA timezone. Keep keys in `.env`.
 
@@ -21,8 +21,6 @@ Set `OWNER_PHONE_NUMBER` before writing memories so the terminal and phone use t
 ```sh
 git clone https://github.com/JakubHojsan/aie-code-personal-agent.git
 cd aie-code-personal-agent
-nvm install
-nvm use
 pnpm install --frozen-lockfile
 cp .env.example .env
 ```

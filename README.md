@@ -11,8 +11,7 @@ The agent runs on your laptop. Qwen inference, Exa search, Kernel browsers, and 
 ## Before you arrive
 
 - Git. The workshop repository is public: [github.com/JakubHojsan/aie-code-personal-agent](https://github.com/JakubHojsan/aie-code-personal-agent).
-- Node.js **26.12.1+**. We recommend [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) for macOS, Linux, or Windows WSL. Install it before class and reopen your terminal.
-- [pnpm](https://pnpm.io/installation) **11+**. If you don't have it, `npm install -g pnpm@11` once Node is installed. Check with `pnpm --version`.
+- [pnpm](https://pnpm.io/installation) **11+**. Check with `pnpm --version`. You don't need to install Node separately: pnpm downloads the Node version pinned in `package.json` (see below).
 - A coding assistant running locally, with support for MCP.
 - An OpenRouter key to start. Arrange Exa, Kernel, and [Linq sandbox access](docs/LINQ.md) before the workshop so you can complete the phone exercises.
 
@@ -23,14 +22,12 @@ Run this at the start of the presentation:
 ```sh
 git clone https://github.com/JakubHojsan/aie-code-personal-agent.git
 cd aie-code-personal-agent
-nvm install
-nvm use
 pnpm install --frozen-lockfile
 cp .env.example .env
 nano .env
 ```
 
-The nvm commands select the version in `.nvmrc`; skip them if you already have Node 26.12.1+ installed. Check with `node --version` and `pnpm --version`.
+**Node version.** `devEngines.runtime` in `package.json` pins Node 26.12.1. `pnpm install` downloads it into `node_modules/` and checks it against the hash in `pnpm-lock.yaml`, and every `pnpm run …` script uses it, whatever Node is installed globally (or none). Running bare `node` in your shell still uses your global Node. Use `pnpm exec node` instead, or run `pnpm shim add node` once to make bare `node` follow the project's pin. To change the version, run `pnpm runtime set node <version>`. The two-week release-age rule doesn't cover Node runtimes, so check the release date at [nodejs.org](https://nodejs.org/en/about/previous-releases) yourself. If the Node version changes, run `pnpm rebuild better-sqlite3` so its native module matches.
 
 `--frozen-lockfile` installs exactly the versions in `pnpm-lock.yaml` and fails instead of changing it. [`pnpm-workspace.yaml`](pnpm-workspace.yaml) sets supply-chain protections that apply to every install, including dependency changes:
 

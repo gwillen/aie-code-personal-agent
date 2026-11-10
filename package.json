@@ -30,5 +30,12 @@
     "mem0ai": "3.3.1",
     "openai": "4.104.0"
   },
-  "description": "Build a laptop-hosted personal agent with Exa, Mem0, Kernel, and Linq"
+  "description": "Build a laptop-hosted personal agent with Exa, Mem0, Kernel, and Linq",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "26.12.1",
+      "onFail": "download"
+    }
+  }
 }
