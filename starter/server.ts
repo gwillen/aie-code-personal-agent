@@ -6,7 +6,7 @@ import { Store } from '../src/store.ts';
 import { Worker } from '../src/worker.ts';
 
 try {
-  if (config.messagingChannel !== 'linq') throw new Error('The starter messaging exercise uses Linq. For WhatsApp, use pnpm run solution:phone and docs/WHATSAPP.md.');
+  if (config.messagingChannel !== 'linq') throw new Error('The starter messaging exercise uses Linq. For WhatsApp or Telegram, see docs/WHATSAPP.md or docs/TELEGRAM.md.');
   assertReady(true);
 } catch (error) { console.error((error as Error).message); process.exit(1); }
 const store = new Store(config.dataDir);

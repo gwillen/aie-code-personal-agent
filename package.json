@@ -19,6 +19,8 @@
     "starter:phone": "node --env-file-if-exists=.env starter/server.ts",
     "solution:chat": "node --env-file-if-exists=.env src/cli.ts",
     "solution:phone": "node --env-file-if-exists=.env src/server.ts",
+    "solution:telegram": "node --env-file-if-exists=.env src/telegram-bot.ts",
+    "telegram:whoami": "node --env-file-if-exists=.env src/telegram-whoami.ts",
     "slides:notes": "node scripts/sync-slide-notes.mjs"
   },
   "devDependencies": {

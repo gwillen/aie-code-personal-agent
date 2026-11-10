@@ -16,6 +16,8 @@ export const config = {
   whatsappAppSecret: process.env.WHATSAPP_APP_SECRET || '',
   whatsappVerifyToken: process.env.WHATSAPP_VERIFY_TOKEN || '',
   whatsappApiVersion: process.env.WHATSAPP_API_VERSION || '',
+  telegramToken: process.env.TELEGRAM_BOT_TOKEN || '',
+  telegramOwnerId: process.env.TELEGRAM_OWNER_ID || '',
   linqKey: process.env.LINQ_API_KEY || '',
   webhookSecret: process.env.LINQ_WEBHOOK_SECRET || '',
   owner: process.env.OWNER_PHONE_NUMBER || '',
@@ -57,7 +59,7 @@ export function assertReady(channel = false): void {
   if (config.milestone >= 3 && !config.kernelKey.trim()) throw new Error('Set KERNEL_API_KEY for milestone 3 and later.');
   if (channel) {
     if (config.milestone < 5) throw new Error('Set WORKSHOP_MILESTONE=5 for phone messaging. Use pnpm run chat for milestones 1–4.');
-    if (!['linq', 'whatsapp'].includes(config.messagingChannel)) throw new Error('Set MESSAGING_CHANNEL to linq or whatsapp.');
+    if (!['linq', 'whatsapp', 'telegram'].includes(config.messagingChannel)) throw new Error('Set MESSAGING_CHANNEL to linq, whatsapp, or telegram.');
     if (!['local', 'jev'].includes(config.reactionMode)) throw new Error('Set REACTION_MODE to local or jev.');
     if (config.messagingChannel === 'linq' && config.reactionMode === 'jev' && !reactionKey().trim()) throw new Error('Set OPENROUTER_API_KEY for Jev reactions.');
     if (!/^\+[1-9]\d{7,14}$/.test(config.owner)) throw new Error('Set OWNER_PHONE_NUMBER in E.164 format.');
@@ -67,6 +69,9 @@ export function assertReady(channel = false): void {
       if (!config.whatsappAppSecret.trim()) throw new Error('Set WHATSAPP_APP_SECRET from your Meta app.');
       if (!config.whatsappVerifyToken.trim()) throw new Error('Set WHATSAPP_VERIFY_TOKEN to your webhook verification token.');
       if (!/^v\d+\.0$/.test(config.whatsappApiVersion)) throw new Error('Set WHATSAPP_API_VERSION to a supported Graph API version from your Meta dashboard (vNN.0).');
+    } else if (config.messagingChannel === 'telegram') {
+      if (!/^\d+:[\w-]{30,}$/.test(config.telegramToken)) throw new Error('Set TELEGRAM_BOT_TOKEN to the token from @BotFather. See docs/TELEGRAM.md.');
+      if (!/^\d+$/.test(config.telegramOwnerId)) throw new Error('Set TELEGRAM_OWNER_ID to your numeric Telegram user ID (pnpm run telegram:whoami). See docs/TELEGRAM.md.');
     } else {
       if (!config.linqKey.trim()) throw new Error('Set LINQ_API_KEY.');
       if (Buffer.from(config.webhookSecret.replace(/^whsec_/, ''), 'base64').length < 16) throw new Error('Set LINQ_WEBHOOK_SECRET from your subscription.');

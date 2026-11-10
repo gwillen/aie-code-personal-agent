@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { Store, Job } from './store.ts';
+import type { Store, Job, Channel } from './store.ts';
 
 export type Generate = (scope: string, text: string) => Promise<string>;
 export type Send = (chat: string, text: string, idempotencyKey: string, request?: string) => Promise<void>;
@@ -12,9 +12,9 @@ export class Worker {
   generate: Generate;
   send: Send;
   acknowledge?: (job: Job) => Promise<void>;
-  channel?: 'linq' | 'whatsapp';
+  channel?: Channel;
   typing?: Typing;
-  constructor(store: Store, generate: Generate, send: Send, acknowledge?: (job: Job) => Promise<void>, channel?: 'linq' | 'whatsapp', typing?: Typing) {
+  constructor(store: Store, generate: Generate, send: Send, acknowledge?: (job: Job) => Promise<void>, channel?: Channel, typing?: Typing) {
     this.store = store; this.generate = generate; this.send = send; this.acknowledge = acknowledge;
     this.channel = channel;
     this.typing = typing;
@@ -41,7 +41,7 @@ export class Worker {
         } catch (error) {
           if (error instanceof DeliveryReviewRequired) {
             this.store.hold(job.id);
-            console.error('WhatsApp delivery requires review; automatic resend disabled. See docs/WHATSAPP.md.');
+            console.error(`Delivery requires review; automatic resend disabled. See docs/${(this.channel ?? 'linq').toUpperCase()}.md.`);
             continue;
           }
           // No provider payloads, message contents, phone numbers, or credentials in logs.

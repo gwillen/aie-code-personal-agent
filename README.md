@@ -2,7 +2,7 @@
 
 Build an agent that remembers your preferences, searches the web, and replies on your phone. The workshop starts with a terminal conversation and ends with iMessage: a short answer, a source card, and optional emoji reactions and voice replies.
 
-The complete demo also supports **WhatsApp** for text replies and source links. Choose `MESSAGING_CHANNEL=whatsapp` and follow [WhatsApp setup](docs/WHATSAPP.md); Linq remains the default and the workshop's messaging exercise.
+The complete demo also supports **WhatsApp** and **Telegram** for text replies and source links. Choose `MESSAGING_CHANNEL=whatsapp` and follow [WhatsApp setup](docs/WHATSAPP.md), or `MESSAGING_CHANNEL=telegram` and follow [Telegram setup](docs/TELEGRAM.md) (no tunnel needed); Linq remains the default and the workshop's messaging exercise.
 
 The agent runs on your laptop. Qwen inference, Exa search, Kernel browsers, and Linq messaging run through hosted APIs. Mem0 stores your preferences locally and uses OpenRouter for extraction and embeddings.
 
@@ -115,6 +115,10 @@ Keep your laptop awake and ngrok running. If the tunnel URL changes, update the 
 ### Optional WhatsApp channel
 
 Follow [docs/WHATSAPP.md](docs/WHATSAPP.md) to obtain Meta Cloud API credentials and connect `/webhooks/whatsapp`. Set `MESSAGING_CHANNEL=whatsapp` and `WORKSHOP_MILESTONE=5` in `.env`, fill in the `WHATSAPP_*` settings, then run `pnpm run doctor` and `pnpm run solution:phone`. WhatsApp mode does not require Linq credentials. Text, search, memory, and source links are supported; voice replies and emoji reactions remain Linq features. The starter exercise still uses Linq.
+
+### Optional Telegram channel
+
+Follow [docs/TELEGRAM.md](docs/TELEGRAM.md): create a bot with @BotFather, set `MESSAGING_CHANNEL=telegram`, `WORKSHOP_MILESTONE=5`, and `TELEGRAM_BOT_TOKEN`, message your bot, then run `pnpm run telegram:whoami` to get your `TELEGRAM_OWNER_ID`. Start it with `pnpm run solution:telegram`. The bot polls Telegram for messages, so it needs no ngrok tunnel or webhook. Text, search, memory, and source links are supported; voice replies and emoji reactions remain Linq features.
 
 ## Present
 

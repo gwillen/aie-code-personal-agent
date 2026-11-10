@@ -9,6 +9,7 @@ import { acknowledgeMessage, sendVoiceReply } from './extras.ts';
 import { sendWhatsAppReply } from './whatsapp.ts';
 import { startTyping } from './typing.ts';
 
+if (config.messagingChannel === 'telegram') { console.error('Telegram uses polling, not this webhook server. Run pnpm run solution:telegram.'); process.exit(1); }
 try { assertReady(true); } catch (error) { console.error((error as Error).message); process.exit(1); }
 const store = new Store(config.dataDir);
 const whatsapp = config.messagingChannel === 'whatsapp';

@@ -5,6 +5,17 @@ import { createHash } from 'node:crypto';
 
 export type Turn = { role: 'user' | 'assistant'; content: string };
 export type Job = { id: string; event_id: string; chat: string; sender: string; text: string; reply: string | null; attempts: number; next_at: number; state: string };
+export type Channel = 'linq' | 'whatsapp' | 'telegram';
+
+// Job chat IDs are namespaced by channel ("whatsapp:…", "telegram:…"); Linq's
+// are unprefixed. A server only takes its own channel's jobs, so switching
+// MESSAGING_CHANNEL can never send an old reply through the wrong provider.
+const prefixedChannels = ['whatsapp', 'telegram'] as const;
+function channelFilter(channel?: Channel): string {
+  if (!channel) return '';
+  if (channel === 'linq') return prefixedChannels.map(prefix => ` AND chat NOT LIKE '${prefix}:%'`).join('');
+  return ` AND chat LIKE '${channel}:%'`;
+}
 
 export class Store {
   directory: string;
@@ -21,18 +32,18 @@ export class Store {
       CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY, event_id TEXT UNIQUE, chat TEXT, sender TEXT, text TEXT,
         reply TEXT, attempts INTEGER DEFAULT 0, next_at INTEGER DEFAULT 0, state TEXT DEFAULT 'pending', last_error TEXT);
       CREATE TABLE IF NOT EXISTS voice_replies(key TEXT PRIMARY KEY, attachment TEXT, state TEXT NOT NULL DEFAULT 'new');
-      CREATE TABLE IF NOT EXISTS whatsapp_outbox(key TEXT PRIMARY KEY, payload_hash TEXT NOT NULL, state TEXT NOT NULL);`);
+      CREATE TABLE IF NOT EXISTS whatsapp_outbox(key TEXT PRIMARY KEY, payload_hash TEXT NOT NULL, state TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS telegram_outbox(key TEXT PRIMARY KEY, payload_hash TEXT NOT NULL, state TEXT NOT NULL);`);
   }
   enqueue(job: Pick<Job, 'id' | 'event_id' | 'chat' | 'sender' | 'text'>): boolean {
     return this.db.prepare('INSERT OR IGNORE INTO jobs(id,event_id,chat,sender,text) VALUES(?,?,?,?,?)').run(job.id, job.event_id, job.chat, job.sender, job.text).changes > 0;
   }
-  next(now = Date.now(), channel?: 'linq' | 'whatsapp'): Job | undefined {
-    const filter = channel === 'whatsapp' ? " AND chat LIKE 'whatsapp:%'" : channel === 'linq' ? " AND chat NOT LIKE 'whatsapp:%'" : '';
-    const job = this.db.prepare(`SELECT * FROM jobs WHERE state='pending'${filter} ORDER BY rowid LIMIT 1`).get() as Job | undefined;
+  next(now = Date.now(), channel?: Channel): Job | undefined {
+    const job = this.db.prepare(`SELECT * FROM jobs WHERE state='pending'${channelFilter(channel)} ORDER BY rowid LIMIT 1`).get() as Job | undefined;
     return job && job.next_at <= now ? job : undefined;
   }
   saveReply(id: string, reply: string) { this.db.prepare('UPDATE jobs SET reply=? WHERE id=?').run(reply, id); }
-  hold(id: string) { this.db.prepare("UPDATE jobs SET state='needs_review',last_error='WhatsApp delivery requires review; not automatically resent' WHERE id=?").run(id); }
+  hold(id: string) { this.db.prepare("UPDATE jobs SET state='needs_review',last_error='Delivery requires review; not automatically resent' WHERE id=?").run(id); }
   retry(id: string, attempts: number, error: string) {
     this.db.prepare('UPDATE jobs SET attempts=?,next_at=?,state=?,last_error=? WHERE id=?').run(attempts, Date.now() + Math.min(60_000, 1000 * 2 ** attempts), attempts >= 3 ? 'failed' : 'pending', error, id);
   }
