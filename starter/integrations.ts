@@ -1,7 +1,7 @@
 // This is the attendee's exercise file. Work through TODOs 1–5 in order.
 // Transport, persistence, validation, and the bounded agent loop are supplied.
 // Complete provider adapters live in ../src/ for reference.
-import type { Complete } from '../src/model.ts';
+import { complete, type Complete } from '../src/model.ts';
 import type { Browse } from '../src/browser.ts';
 import type { PersonalMemory } from '../src/memory.ts';
 import type { Store } from '../src/store.ts';
@@ -13,12 +13,9 @@ export class IntegrationIncomplete extends Error {
   }
 }
 
-export const callModel: Complete = async (_messages, _tools, _signal) => {
-  // TODO 1 — MODEL
-  // Connect the supplied complete() transport in ../src/model.ts.
-  // Forward messages, tools, and the abort signal; return the assistant message.
-  throw new IntegrationIncomplete(1, 'the model');
-};
+// TODO 1 — MODEL (done): forward to the supplied OpenAI-compatible transport,
+// which POSTs to MODEL_BASE_URL/chat/completions and returns the assistant message.
+export const callModel: Complete = (messages, tools, signal) => complete(messages, tools, signal);
 
 export async function searchWeb(_query: string, _signal: AbortSignal): Promise<unknown> {
   // TODO 2 — EXA
