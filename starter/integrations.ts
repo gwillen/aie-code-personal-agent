@@ -4,7 +4,7 @@
 import { complete, type Complete } from '../src/model.ts';
 import { config } from '../src/config.ts';
 import { browse, type Browse } from '../src/browser.ts';
-import type { PersonalMemory } from '../src/memory.ts';
+import { personalMemory, type PersonalMemory } from '../src/memory.ts';
 import type { Store } from '../src/store.ts';
 import type { Send } from '../src/worker.ts';
 
@@ -78,11 +78,12 @@ export async function searchWeb(query: string, signal: AbortSignal): Promise<unk
 // Docs: https://www.kernel.sh/docs/introduction/create
 export const readPage: Browse = (url, question, signal) => browse(url, question, signal);
 
-export function connectMemory(_store: Store): PersonalMemory {
-  // TODO 4 — MEM0
-  // Return the personalMemory(store) adapter from ../src/memory.ts.
-  // Its list/search/remember/forget methods share one owner scope.
-  throw new IntegrationIncomplete(4, 'Mem0');
+// TODO 4 — MEM0 (done): return the supplied Mem0 OSS adapter (one cached
+// instance per store). Each call runs a short-lived worker over local files in
+// DATA_DIR/mem0/<sha256(owner)>/, using the model endpoint for fact extraction
+// and embeddings. Docs: https://docs.mem0.ai/open-source/node-quickstart
+export function connectMemory(store: Store): PersonalMemory {
+  return personalMemory(store);
 }
 
 export const deliverReply: Send = async (_chat, _text, _idempotencyKey, _request) => {
